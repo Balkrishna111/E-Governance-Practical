@@ -5,8 +5,10 @@ import { useDropzone } from "react-dropzone";
 import { useEffect, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { getReports, uploadReport } from "../../services/apiQuery";
+import { useNavigate } from "react-router-dom";
 
 const Report = () => {
+  const navigate = useNavigate();
   const { acceptedFiles, getRootProps, getInputProps } = useDropzone({
     accept: {
       "image/png": [".png"],
@@ -18,7 +20,10 @@ const Report = () => {
   const { mutate: postReport } = useMutation({
     mutationFn: () => uploadReport(formData),
     onSuccess: (data: any) => {
-      toast.success(data.response.data.message, { toastId: "report-response" });
+      navigate("/");
+      toast.success("Report Filed Successfully", {
+        toastId: "report-response",
+      });
     },
     onError: (data: any) => {
       toast.error(data.response.data.message, { toastId: "report-response" });
@@ -35,7 +40,7 @@ const Report = () => {
   const [email, setEmail] = useState<string | null>(null);
   const [location, setLocation] = useState<string | null>(null);
   const [landmark, setLandmark] = useState<string | null>(null);
-  const [phoneNumber, setPhoneNumber] = useState<number | null>(null);
+  const [phoneNumber, setPhoneNumber] = useState<number>(98);
   const [length, setLength] = useState<number | null>(null);
   const [breadth, setBreadth] = useState<number | null>(null);
 
@@ -61,10 +66,17 @@ const Report = () => {
     // acceptedFiles.forEach((file) => {
     //   formData.append("images", file); // 👈 key name matches Multer setup
     // });
-    if (acceptedFiles.length > 0 && acceptedFiles.length <= 3) {
-      postReport();
+    const nepaliPhoneRegex = /^(?:\+977[- ]?)?(98\d{8})$/;
+
+    if (!nepaliPhoneRegex.test(phoneNumber)) {
+      toast.error("Invalid phone number");
+      return;
     } else {
-      toast.error("Form field error");
+      if (acceptedFiles.length > 0 && acceptedFiles.length <= 3) {
+        postReport();
+      } else {
+        toast.error("Form field error");
+      }
     }
   };
 
@@ -80,7 +92,7 @@ const Report = () => {
           <h1 className='text-5xl font-bold mb-5'>Create a report</h1>
           <form
             action=''
-            className='grid grid-cols-2 gap-8'
+            className='grid grid-cols-1 md:grid-cols-2 gap-8'
             onSubmit={handleSubmit}
           >
             <div>
@@ -91,7 +103,7 @@ const Report = () => {
                 <input
                   type='text'
                   placeholder='Full Name'
-                  id='name'
+                  required
                   onChange={(e) => setFullName(e.target.value)}
                   className='border rounded-sm px-3 py-1 w-full'
                 />
@@ -101,9 +113,9 @@ const Report = () => {
                   Email:<span className='text-red-500'>*</span>
                 </label>
                 <input
-                  type='text'
+                  type='email'
                   placeholder='E-Mail'
-                  id='name'
+                  required
                   onChange={(e) => setEmail(e.target.value)}
                   className='border rounded-sm px-3 py-1 w-full'
                 />
@@ -113,8 +125,10 @@ const Report = () => {
                   Phone Number:<span className='text-red-500'>*</span>
                 </label>
                 <input
-                  type='number'
+                  type='text'
+                  required
                   placeholder='Phone Number'
+                  pattern='^(?:\+977[- ]?)?(98\d{8})$'
                   onChange={(e) => setPhoneNumber(Number(e.target.value))}
                   id='name'
                   className='border rounded-sm px-3 py-1 w-full'
@@ -127,6 +141,7 @@ const Report = () => {
                 <input
                   type='text'
                   placeholder='Location'
+                  required
                   onChange={(e) => setLocation(e.target.value)}
                   id='name'
                   className='border rounded-sm px-3 py-1 w-full'
@@ -140,6 +155,7 @@ const Report = () => {
                 <input
                   type='text'
                   placeholder='Landmark'
+                  required
                   onChange={(e) => setLandmark(e.target.value)}
                   id='name'
                   className='border rounded-sm px-3 py-1 w-full'
@@ -156,6 +172,7 @@ const Report = () => {
                     <input
                       type='number'
                       placeholder='Length'
+                      required
                       id='name'
                       onChange={(e) => setLength(Number(e.target.value))}
                       className='border rounded-sm px-3 py-1 w-full'
@@ -166,6 +183,7 @@ const Report = () => {
                     <input
                       type='number'
                       placeholder='Breadth'
+                      required
                       id='name'
                       onChange={(e) => setBreadth(Number(e.target.value))}
                       className='border rounded-sm px-3 py-1 w-full'

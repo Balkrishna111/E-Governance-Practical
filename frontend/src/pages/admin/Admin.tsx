@@ -55,11 +55,15 @@ const Admin = () => {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody className='w-full'>
-            {reportData?.data.map((item: any) => (
-              <ReportTableRow details={item} />
-            ))}
-          </tbody>
+          {reportData?.data.length > 0 ? (
+            <tbody className='w-full'>
+              {reportData?.data.map((item: any) => (
+                <ReportTableRow details={item} />
+              ))}
+            </tbody>
+          ) : (
+            <h1 className='text-2xl my-5 text-red-600'>No Reports to show</h1>
+          )}
         </table>
       </section>
       <div className='fixed bottom-0 left-0'>
